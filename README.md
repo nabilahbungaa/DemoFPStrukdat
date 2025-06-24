@@ -512,5 +512,122 @@ if (indeks == -1) {
 Menggunakan fungsi cari_data(id) untuk mencari ID pegawai di dalam array indeks.
 Jika ID tidak ditemukan (indeks == -1), menampilkan pesan error dan keluar dari fungsi.
 
+```
+fseek(file_data, daftar_indeks[indeks].posisi, SEEK_SET);
+Pegawai pegawai;
+fread(&pegawai, sizeof(Pegawai), 1, file_data);
+```
+fseek(): Mengatur posisi file ke lokasi data pegawai yang ingin diubah, berdasarkan posisi yang disimpan di array daftar_indeks[].
+fread(): Membaca data pegawai dari file ke dalam variabel pegawai.
+
+```
+printf("\nData Lama:\n");
+printf("ID: %s\n", pegawai.id);
+printf("Nama: %s\n", pegawai.nama);
+printf("Gender: %s\n", pegawai.gender ? "Laki-laki" : "Perempuan");
+```
+Menampilkan data pegawai yang lama, seperti ID, nama, gender, dan gaji dengan format yang sesuai.
+
+```
+char formatted_gaji[20];
+format_gaji(pegawai.gaji, formatted_gaji);
+printf("Gaji: Rp. %s\n", formatted_gaji);
+```
+Menggunakan fungsi format_gaji() untuk memformat gaji agar tampil dengan format yang lebih mudah dibaca.
+Menampilkan gaji yang sudah diformat.
+
+```
+printf("\nMasukkan Data Baru:\n");
+```
+Memberikan penanda bahwa sekarang pengguna akan memasukkan data baru untuk pegawai tersebut
+
+```
+printf("Nama Pegawai (maks 25 huruf): ");
+scanf(" %25[^\n]", pegawai.nama);
+bersihkan_buffer();
+```
+Meminta pengguna untuk memasukkan nama baru pegawai, dengan panjang maksimal 25 karakter.
+Menggunakan bersihkan_buffer() untuk memastikan input berikutnya tidak terpengaruh oleh karakter yang tidak diinginkan.
+
+```
+while (1) {
+    printf("Gender (0: Perempuan, 1: Laki-laki): ");
+    scanf("%d", &pegawai.gender);
+    bersihkan_buffer();
+    
+    if (pegawai.gender != 0 && pegawai.gender != 1) {
+        printf("Masukkan 0 atau 1!\n");
+        continue;
+    }
+    break;
+}
+```
+Meminta pengguna untuk memasukkan gender baru dengan validasi:
+Gender harus 0 untuk perempuan atau 1 untuk laki-laki.
+Jika input tidak valid, pengguna diminta untuk mencoba lagi.
+
+```
+pegawai.gaji = input_gaji();
+```
+Memanggil fungsi input_gaji() untuk meminta dan memvalidasi gaji baru yang akan dimasukkan.
+
+```
+fseek(file_data, daftar_indeks[indeks].posisi, SEEK_SET);
+fwrite(&pegawai, sizeof(Pegawai), 1, file_data);
+fflush(file_data);
+```
+fseek(): Mengatur posisi file kembali ke posisi data pegawai yang akan diubah.
+fwrite(): Menulis data pegawai yang sudah diperbarui ke file.
+fflush(): Memastikan perubahan segera disimpan ke disk.
+
+```
+printf("\nData berhasil diubah!\n");
+```
+Menampilkan pesan yang menunjukkan bahwa data pegawai telah berhasil diubah.
+
+## FUNGSI HAPUS DATA
+
+```
+char id[7];
+```
+Mendeklarasikan variabel id yang akan menyimpan ID pegawai yang akan dihapus.
+
+```
+printf("\n=== HAPUS DATA PEGAWAI ===\n");
+printf("Masukkan ID Pegawai yang akan dihapus: ");
+scanf("%6s", id);
+bersihkan_buffer();
+```
+Menampilkan pesan untuk memberi tahu pengguna bahwa mereka akan menghapus data pegawai.
+Meminta pengguna untuk memasukkan ID pegawai yang ingin dihapus, kemudian membersihkan buffer input.
+
+```
+int indeks = cari_data(id);
+if (indeks == -1) {
+    printf("Error: ID tidak ditemukan!\n");
+    return;
+}
+```
+Menggunakan fungsi cari_data(id) untuk mencari ID pegawai yang akan dihapus.
+Jika ID tidak ditemukan (indeks == -1), menampilkan pesan error dan keluar dari fungsi.
+
+```
+fseek(file_data, daftar_indeks[indeks].posisi, SEEK_SET);
+Pegawai pegawai;
+fread(&pegawai, sizeof(Pegawai), 1, file_data);
+```
+fseek(): Mengatur posisi file ke lokasi data pegawai yang akan dihapus berdasarkan posisi yang disimpan dalam daftar_indeks[].
+fread(): Membaca data pegawai dari file ke dalam variabel pegawai.
+
+```
+pegawai.is_deleted = 1;
+```
+Menandakan bahwa data pegawai ini dihapus dengan mengubah nilai is_deleted menjadi 1.
+
+```
+fseek(file_data, daftar_indeks[indeks].posisi, SEEK_SET);
+fwrite(&pegawai, sizeof(Pegawai), 1, file_data);
+fflush(file_data);
+
 
 
