@@ -628,6 +628,242 @@ Menandakan bahwa data pegawai ini dihapus dengan mengubah nilai is_deleted menja
 fseek(file_data, daftar_indeks[indeks].posisi, SEEK_SET);
 fwrite(&pegawai, sizeof(Pegawai), 1, file_data);
 fflush(file_data);
+```
+fseek(): Mengatur posisi file ke lokasi data pegawai yang akan dihapus berdasarkan posisi yang disimpan dalam daftar_indeks[].
+fread(): Membaca data pegawai dari file ke dalam variabel pegawai.
 
+```
+pegawai.is_deleted = 1;
+```
+Menandakan bahwa data pegawai ini dihapus dengan mengubah nilai is_deleted menjadi 1.
+
+```
+fseek(file_data, daftar_indeks[indeks].posisi, SEEK_SET);
+fwrite(&pegawai, sizeof(Pegawai), 1, file_data);
+fflush(file_data);
+```
+fseek(): Memindahkan pointer file kembali ke posisi data pegawai yang akan diubah.
+fwrite(): Menulis kembali data pegawai yang telah diubah (menandakan sebagai dihapus) ke file.
+fflush(): Memastikan perubahan disimpan segera ke disk.
+
+```
+for (int i = indeks; i < jumlah_indeks - 1; i++) {
+    daftar_indeks[i] = daftar_indeks[i + 1];
+}
+jumlah_indeks--;
+```
+Menggeser elemen-elemen dalam array daftar_indeks[] untuk menghapus indeks yang terkait dengan pegawai yang telah dihapus.
+Mengurangi jumlah indeks yang tercatat (jumlah_indeks--).
+
+```
+simpan_indeks();
+```
+Memanggil fungsi simpan_indeks() untuk menyimpan array indeks yang telah diperbarui ke dalam file indeks.dat.
+
+```
+printf("\nData berhasil dihapus!\n");
+```
+Menampilkan pesan yang memberitahukan bahwa data pegawai telah berhasil dihapus.
+
+## FUNGSI TAMPILKAN DATA
+
+```
+system("cls");
+```
+Fungsi system("cls") digunakan untuk membersihkan layar terminal sebelum menampilkan data.
+
+```
+printf("%s\n", pakai_indeks ? "DATA PEGAWAI (DENGAN INDEKS)" : "DATA PEGAWAI (TANPA INDEKS)");
+```
+Menampilkan judul "DATA PEGAWAI" dengan keterangan apakah data ditampilkan menggunakan indeks atau tidak, berdasarkan nilai pakai_indeks.
+
+```
+printf("+--------+---------------------------+------------+---------------------+\n");
+printf("| %-6s | %-25s | %-10s | %-19s |\n", "ID", "NAMA", "GENDER", "GAJI");
+printf("+--------+---------------------------+------------+---------------------+\n");
+```
+Menampilkan header tabel untuk data pegawai dengan format yang rapi.
+
+```
+double total_gaji = 0;
+int jumlah_data = 0;
+char formatted_gaji[20];
+```
+Mendeklarasikan variabel untuk menghitung total gaji (total_gaji), menghitung jumlah data (jumlah_data), dan menampung format gaji yang sudah diformat (formatted_gaji).Mendeklarasikan variabel untuk menghitung total gaji (total_gaji), menghitung jumlah data (jumlah_data), dan menampung format gaji yang sudah diformat (formatted_gaji).
+
+```
+if (pakai_indeks) {
+    for (int i = 0; i < jumlah_indeks; i++) {
+        fseek(file_data, daftar_indeks[i].posisi, SEEK_SET);
+        Pegawai pegawai;
+        fread(&pegawai, sizeof(Pegawai), 1, file_data);
+        
+        if (pegawai.is_deleted) continue;
+        
+        format_gaji(pegawai.gaji, formatted_gaji);
+        printf("| %-6s | %-25s | %-10s | Rp. %15s |\n", 
+               pegawai.id, 
+               pegawai.nama, 
+               pegawai.gender ? "Laki" : "Perempuan", 
+               formatted_gaji);
+        total_gaji += pegawai.gaji;
+        jumlah_data++;
+        
+        if (jumlah_data % 20 == 0) {
+            printf("+--------+---------------------------+------------+---------------------+\n");
+            printf("Tekan enter untuk melanjutkan...");
+            getch();
+            printf("\n");
+            printf("| %-6s | %-25s | %-10s | %-19s |\n", "ID", "NAMA", "GENDER", "GAJI");
+            printf("+--------+---------------------------+------------+---------------------+\n");
+        }
+    }
+}
+```
+Jika pakai_indeks bernilai true, fungsi ini menampilkan data pegawai dengan menggunakan indeks.
+fseek(): Menentukan posisi data pegawai berdasarkan posisi yang ada dalam indeks.
+fread(): Membaca data pegawai dari file.
+pegawai.is_deleted: Memeriksa apakah pegawai sudah dihapus, jika ya, data tersebut dilewatkan.
+format_gaji(): Memformat gaji pegawai untuk ditampilkan dengan format yang sesuai.
+printf(): Menampilkan data pegawai.
+total_gaji: Menambahkan gaji pegawai ke total gaji.
+jumlah_data: Menghitung jumlah data pegawai yang ditampilkan.
+if (jumlah_data % 20 == 0): Setiap 20 data yang ditampilkan, program meminta pengguna menekan enter untuk melanjutkan.
+
+```
+else {
+    rewind(file_data);
+    Pegawai pegawai;
+    while (fread(&pegawai, sizeof(Pegawai), 1, file_data)) {
+        if (pegawai.is_deleted) continue;
+        
+        format_gaji(pegawai.gaji, formatted_gaji);
+        printf("| %-6s | %-25s | %-10s | Rp. %15s |\n", 
+               pegawai.id, 
+               pegawai.nama, 
+               pegawai.gender ? "Laki" : "Perempuan", 
+               formatted_gaji);
+        total_gaji += pegawai.gaji;
+        jumlah_data++;
+        
+        if (jumlah_data % 20 == 0) {
+            printf("+--------+---------------------------+------------+---------------------+\n");
+            printf("Tekan enter untuk melanjutkan...");
+            getch();
+            printf("\n");
+            printf("| %-6s | %-25s | %-10s | %-15s |\n", "ID", "NAMA", "GENDER", "GAJI");
+            printf("+--------+---------------------------+------------+---------------------+\n");
+        }
+    }
+}
+```
+Jika pakai_indeks bernilai false, fungsi ini akan menampilkan data tanpa menggunakan indeks.
+rewind(file_data): Mengatur ulang pointer file ke awal.
+fread(): Membaca data pegawai dari file secara langsung.
+pegawai.is_deleted: Memeriksa apakah pegawai sudah dihapus, jika ya, data tersebut dilewatkan.
+printf(): Menampilkan data pegawai dengan format yang rapi.
+total_gaji dan jumlah_data: Menambahkan gaji pegawai ke total gaji dan menghitung jumlah data.
+if (jumlah_data % 20 == 0): Setiap 20 data yang ditampilkan, program meminta pengguna menekan enter untuk melanjutkan.
+
+```
+char formatted_total[20];
+format_gaji(total_gaji, formatted_total);
+printf("+--------+---------------------------+------------+---------------------+\n");
+printf("| %43s     | Rp. %15s |\n", "TOTAL GAJI PEGAWAI", formatted_total);
+printf("+--------+---------------------------+------------+---------------------+\n");
+```
+Menghitung dan menampilkan total gaji pegawai yang sudah ditampilkan.
+format_gaji(): Memformat total gaji untuk ditampilkan.
+printf(): Menampilkan total gaji dengan format yang rapi.
+
+## FUNGSI UTAMA
+
+```
+file_data = fopen("pegawai.dat", "rb+");
+if (!file_data) file_data = fopen("pegawai.dat", "wb+");
+if (!file_data) {
+    printf("Gagal membuka file data!");
+    return 1;
+}
+```
+fopen("pegawai.dat", "rb+"): Membuka file pegawai.dat untuk dibaca dan ditulis (binary mode). Jika file tidak ada, maka dilanjutkan ke baris berikutnya.
+fopen("pegawai.dat", "wb+"): Jika file tidak ditemukan, membuka file baru dengan mode baca dan tulis (binary mode).
+if (!file_data): Jika file gagal dibuka, menampilkan pesan kesalahan dan keluar dengan status 1.
+
+```
+muat_indeks();
+```
+Memanggil fungsi muat_indeks() untuk memuat data indeks pegawai dari file indeks.dat.
+
+```
+char pilihan;
+do {
+```
+Mendeklarasikan variabel pilihan untuk menyimpan input menu yang dipilih oleh pengguna. Dimulai dengan do-while loop untuk menjalankan menu hingga pengguna memilih keluar.
+
+```
+system("cls");
+printf("SISTEM PENGELOLAAN DATA PEGAWAI\n");
+printf("===============================\n");
+printf("A. Tambah Data\n");
+printf("U. Ubah Data\n");
+printf("D. Tampilkan Data (dengan Indeks)\n");
+printf("T. Tampilkan Data (tanpa Indeks)\n");
+printf("H. Hapus Data\n");
+printf("K. Keluar\n");
+printf("Pilihan [A/U/D/T/H/K]: ");
+```
+system("cls"): Membersihkan layar terminal agar tampilan menu lebih bersih.
+Menampilkan menu pilihan dengan opsi untuk tambah, ubah, tampilkan, hapus data, atau keluar.
+
+```
+scanf(" %c", &pilihan);
+bersihkan_buffer();
+```
+scanf(" %c", &pilihan): Membaca karakter input dari pengguna untuk memilih menu.
+bersihkan_buffer(): Fungsi untuk membersihkan buffer input agar tidak ada karakter sisa yang terbaca.
+
+```
+pilihan = toupper(pilihan);
+```
+toupper(pilihan): Mengubah input pengguna menjadi huruf kapital agar perbandingan lebih mudah.
+
+```
+switch (pilihan) {
+    case 'A': tambah_data(); break;
+    case 'U': ubah_data(); break;
+    case 'D': tampil_data(1); break;
+    case 'T': tampil_data(0); break;
+    case 'H': hapus_data(); break;
+    case 'K': break;
+    default: printf("Pilihan tidak valid!\n");
+}
+```
+switch (pilihan): Memeriksa nilai pilihan dan mengeksekusi fungsi sesuai dengan opsi yang dipilih:
+A: Menambah data pegawai.
+U: Mengubah data pegawai.
+D: Menampilkan data pegawai dengan indeks.
+T: Menampilkan data pegawai tanpa indeks.
+H: Menghapus data pegawai.
+K: Keluar dari menu.
+default: Jika input tidak valid, menampilkan pesan error.
+
+```
+if (pilihan != 'K') {
+    printf("\nTekan enter untuk melanjutkan...");
+    getch();
+}
+```
+if (pilihan != 'K'): Jika pengguna tidak memilih keluar, program meminta pengguna menekan enter untuk melanjutkan.
+
+```
+fclose(file_data);
+```
+Menutup file pegawai.dat setelah semua operasi selesai.
+
+```
+return 0;
+```
+Program selesai, mengembalikan nilai 0 sebagai tanda bahwa program berjalan dengan sukses.
 
 
